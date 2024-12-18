@@ -3,7 +3,7 @@ const puppeteer = require('puppeteer');
 const puppeteercore = require('puppeteer-core');
 const path = require('path');
 const fs = require('fs');
-
+const { chromium } = require('playwright');
 
 const app = express();
 const port = 3000;
@@ -23,9 +23,9 @@ app.get('/screenshot', async (req, res) => {
   await logDirectoryContents(pathmy);
 
   try {
-    const browser = await puppeteercore.launch({ 
+    const browser = await puppeteercore.launch({
       executablePath: puppeteer.executablePath(),
-      headless: true 
+      headless: true
     });
 
     const page = await browser.newPage();
@@ -53,10 +53,37 @@ app.get('/screenshot', async (req, res) => {
   }
 });
 
+
+app.get('/screenshot2', async (req, res) => {
+  const url = req.query.url; // URL to capture as a query parameter
+
+  if (!url) {
+    return res.status(400).send('URL parameter is required');
+  }
+  try {
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+    const screenshotPath = `${timestamp}.png`;
+
+    const browser = await chromium.launch();
+    const page = await browser.newPage();
+    await page.goto(url);
+    await page.screenshot({ path: screenshotPath });
+    await browser.close();
+  } catch (err) {
+    console.error('Error capturing screenshot:', err);
+    res.status(500).send('Error capturing screenshot');
+  }
+});
+
 function logDirectoryContents(dirPath, targetFolder) {
   if (fs.existsSync(dirPath)) {
-    console.log(`✅ Directory found: ${dirPath}`);
-    
     try {
       const items = fs.readdirSync(dirPath, { withFileTypes: true });
       for (const item of items) {
@@ -69,7 +96,7 @@ function logDirectoryContents(dirPath, targetFolder) {
             return fullPath; // Return path if found
           }
 
-          const found = logDirectoryContents(fullPath, targetFolder); 
+          const found = logDirectoryContents(fullPath, targetFolder);
           if (found) return found;
         }
       }
