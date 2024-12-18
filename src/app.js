@@ -2,6 +2,8 @@ const express = require('express');
 const puppeteer = require('puppeteer');
 const puppeteercore = require('puppeteer-core');
 const path = require('path');
+const fs = require('fs');
+
 
 const app = express();
 const port = 3000;
@@ -17,8 +19,13 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
-  console.log(puppeteer.executablePath());
-  
+  const chromePath = puppeteer.executablePath()
+
+  if (fs.existsSync(chromePath)) {
+    console.log('✅ Chrome path exists:', chromePath);
+  } else {
+    console.error('❌ Chrome path not found!');
+  }
 
   try {
     const browser = await puppeteercore.launch({ 
