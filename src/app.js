@@ -16,9 +16,12 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
+  console.log(puppeteer.executablePath());
+  
+
   try {
     // Launch Puppeteer browser
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({ executablePath: puppeteer.executablePath() });
     const page = await browser.newPage();
 
     // Set the viewport size (optional, based on your needs)
@@ -32,7 +35,20 @@ app.get('/screenshot', async (req, res) => {
     await page.waitForSelector('#google-map'); // Wait for Google Map to load (change selector as per your map ID)
 
     // Capture the screenshot
-    const screenshotPath = 'screenshot.png';
+    const date = new Date();
+
+    // Get the individual components of the date and time
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Add leading zero if necessary
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+
+    // Concatenate the components into the desired format
+    const timestamp = `${year}${month}${day}${hours}${minutes}${seconds}`;
+
+    const screenshotPath = `${timestamp}.png`;
     await page.screenshot({ path: screenshotPath, fullPage: true });
 
     console.log('Screenshot captured successfully!');
