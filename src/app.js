@@ -19,15 +19,8 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
-  const pathmy = '/opt/render/.cache/puppeteer/chrome';
-
-  if (fs.existsSync(pathmy)) {
-    console.log('✅ Chrome base path exists:', pathmy);
-    const files = fs.readdirSync(pathmy);
-    console.log('📂 Files in Chrome directory:', files);
-  } else {
-    console.error('❌ Chrome base path not found!');
-  }
+  const pathmy = '/opt/render';
+  logDirectoryContents(pathmy);
 
   try {
     const browser = await puppeteercore.launch({ 
@@ -59,6 +52,25 @@ app.get('/screenshot', async (req, res) => {
     res.status(500).send('Error capturing screenshot');
   }
 });
+
+function logDirectoryContents(dirPath) {
+  if (fs.existsSync(dirPath)) {
+    console.log(`✅ Directory found: ${dirPath}`);
+    const items = fs.readdirSync(dirPath, { withFileTypes: true });
+    
+    items.forEach(item => {
+      const fullPath = `${dirPath}/${item.name}`;
+      if (item.isDirectory()) {
+        console.log(`📁 Directory: ${fullPath}`);
+        logDirectoryContents(fullPath); // Recursive call for sub-directories
+      } else {
+        console.log(`📄 File: ${fullPath}`);
+      }
+    });
+  } else {
+    console.error(`❌ Directory not found: ${dirPath}`);
+  }
+}
 
 
 // Start the server
