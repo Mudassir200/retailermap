@@ -19,12 +19,14 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
-  const chromePath = puppeteer.executablePath()
+  const pathmy = '/opt/render/.cache/puppeteer/chrome';
 
-  if (fs.existsSync(chromePath)) {
-    console.log('✅ Chrome path exists:', chromePath);
+  if (fs.existsSync(pathmy)) {
+    console.log('✅ Chrome base path exists:', pathmy);
+    const files = fs.readdirSync(pathmy);
+    console.log('📂 Files in Chrome directory:', files);
   } else {
-    console.error('❌ Chrome path not found!');
+    console.error('❌ Chrome base path not found!');
   }
 
   try {
