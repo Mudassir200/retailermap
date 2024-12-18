@@ -53,23 +53,43 @@ app.get('/screenshot', async (req, res) => {
   }
 });
 
-function logDirectoryContents(dirPath) {
+function logDirectoryContents(dirPath, targetFolder) {
   if (fs.existsSync(dirPath)) {
     console.log(`✅ Directory found: ${dirPath}`);
-    const items = fs.readdirSync(dirPath, { withFileTypes: true });
     
-    items.forEach(item => {
-      const fullPath = `${dirPath}/${item.name}`;
-      if (item.isDirectory()) {
-        console.log(`📁 Directory: ${fullPath}`);
-        logDirectoryContents(fullPath); // Recursive call for sub-directories
-      } 
-    });
+    try {
+      const items = fs.readdirSync(dirPath, { withFileTypes: true });
+      console.log(items);
+
+      for (const item of items) {
+        const fullPath = path.join(dirPath, item.name);
+
+        if (item.isDirectory()) {
+          // Check if it's the target folder
+          if (item.name === targetFolder) {
+            console.log(`✅ Found folder: ${fullPath}`);
+            return fullPath; // Return path if found
+          }
+
+          console.log(`📁 Directory: ${fullPath}`);
+          // Recursively check sub-directories
+          const found = logDirectoryContents(fullPath, targetFolder); 
+          if (found) return found;
+        }
+      }
+    } catch (err) {
+      if (err.code === 'EACCES') {
+        console.error(`❌ Permission denied: ${dirPath}`);
+        // Skip this directory and continue
+        return null;
+      } else {
+        throw err; // Re-throw the error if it's not a permission error
+      }
+    }
   } else {
     console.error(`❌ Directory not found: ${dirPath}`);
   }
 }
-
 
 // Start the server
 app.listen(port, () => {
