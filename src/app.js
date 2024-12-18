@@ -19,7 +19,7 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
-  const pathmy = '/opt/render/.cache';
+  const pathmy = '/';
   logDirectoryContents(pathmy);
 
   try {
@@ -63,9 +63,7 @@ function logDirectoryContents(dirPath) {
       if (item.isDirectory()) {
         console.log(`📁 Directory: ${fullPath}`);
         logDirectoryContents(fullPath); // Recursive call for sub-directories
-      } else {
-        console.log(`📄 File: ${fullPath}`);
-      }
+      } 
     });
   } else {
     console.error(`❌ Directory not found: ${dirPath}`);
