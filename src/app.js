@@ -20,7 +20,7 @@ app.get('/screenshot', async (req, res) => {
   }
 
   const pathmy = '/opt/';
-  logDirectoryContents(pathmy);
+  await logDirectoryContents(pathmy);
 
   try {
     const browser = await puppeteercore.launch({ 
@@ -69,8 +69,6 @@ function logDirectoryContents(dirPath, targetFolder) {
             return fullPath; // Return path if found
           }
 
-          console.log(`📁 Directory: ${fullPath}`);
-          // Recursively check sub-directories
           const found = logDirectoryContents(fullPath, targetFolder); 
           if (found) return found;
         }
