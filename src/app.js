@@ -19,7 +19,7 @@ app.get('/screenshot', async (req, res) => {
     return res.status(400).send('URL parameter is required');
   }
 
-  const pathmy = '/opt/render';
+  const pathmy = '/opt/render/.cache';
   logDirectoryContents(pathmy);
 
   try {
