@@ -59,8 +59,6 @@ function logDirectoryContents(dirPath, targetFolder) {
     
     try {
       const items = fs.readdirSync(dirPath, { withFileTypes: true });
-      console.log(items);
-
       for (const item of items) {
         const fullPath = path.join(dirPath, item.name);
 
